@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import sys, select
+from urlparse import urlparse
 
 class Item:
 
@@ -147,34 +148,35 @@ class Item:
 	    
 
 def add_item_to_track(items):
-    loop = 0
-    while (loop == 0):
-	print "\nEnter company to add (Pres 1, 2 or 3):\n1 Snapdeal\n2 Amazon\n3 Flipkart"
-	ip = int(raw_input())
-	if ip == 1:
-	    company = "Snapdeal"
-	    loop = 1
-	elif ip == 2:
-	    company = "Amazon"
-	    loop = 1
-	elif ip == 3:
-	    company = "Flipkart"
-	    loop = 1
-	else:
-	    print "Wrong input. Please try again\n"
+    try:
+        print "\nPaste URL of product from Snapdeal/Amazon/Flipkart:"
 
-    print "\nPaste URL of product:"
-    url = raw_input().strip()
+        url = raw_input().strip()
+        parsed_uri = urlparse(url)
+        domain = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
 
-    print "\nEnter price below which you want to be notified:"
-    notif_p = float(raw_input())
-    temp_item = Item(company, url, notif_p)
-    if temp_item.actual_p < temp_item.notif_p:
-	print "\n---------------Item price is already less than notification price---------------"
-	return
-    else:
-	items.append(temp_item)
-    
+        if str.find(domain, "amazon") > -1:
+	        company = "Amazon"
+        elif str.find(domain, "snapdeal") > -1:
+	        company = "Snapdeal"
+        elif str.find(domain, "flipkart"):
+	        company = "Flipkart"
+        else:
+	        print "Not a valid url"
+
+        print "\nEnter price below which you want to be notified:"
+        notif_p = float(raw_input())
+        temp_item = Item(company, url, notif_p)
+        
+        if temp_item.actual_p < temp_item.notif_p:
+            print "\n---------------Item price is already less than notification price---------------"
+            return
+        else:
+            items.append(temp_item)
+    except:
+        print "An error occured"
+        pass
+
 
 def delete_tracked_item(items):
 
